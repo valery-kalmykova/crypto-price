@@ -1,0 +1,28 @@
+.section  {
+  max-width: 1024px;
+  margin: 0 auto;
+  border: 2px solid #6a6d78;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 248px;
+  grid-template-rows: 40px 1fr;
+  grid-template-areas:
+    "header sidebar"
+    "main sidebar";
+}
+
+.item__header {
+  grid-area: header;
+  background-color: #121212;
+}
+
+.item__main {
+  grid-area: main;
+  background-color: #121212;
+  height: 100%;
+}
+
+.item__sidebar {
+  grid-area: sidebar;
+  background-color: #121212;
+}

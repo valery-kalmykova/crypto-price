@@ -1,0 +1,9 @@
+body {
+  margin: 0;
+  background-color: #121212;
+  color: #d1d4dc;
+  overflow: hidden;
+  font-family: "Roboto", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

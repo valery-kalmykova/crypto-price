@@ -1,0 +1,14 @@
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 60px;
+  border-bottom: 2px solid #6a6d78;;
+}
+
+.coin {
+  font-size: 18px;
+  font-weight: 700;
+}
