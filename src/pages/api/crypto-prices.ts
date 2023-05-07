@@ -20,9 +20,10 @@ export default async function handler(
   res: NextApiResponse<Ialtcoins[] | string>
 ) {
 
-  if (req.method === "POST") {
-    altcoins.push(req.body);
-  }
+  // if (req.method === "POST") {
+  //   altcoins.push(req.body);
+  // }
+  altcoins.push({name: 'BTCUSDT', price:[25000]})
 
   const prices = await fetchAltcoinPrices(altcoins);
   for (let i = 0; i < altcoins.length; i++) {
