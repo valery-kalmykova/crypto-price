@@ -15,15 +15,15 @@ export default function Home() {
   const [altcoins, setAltcoins] = useState<Ialtcoins[]>([]);
 
   const handleSubmit = async ( newData: { name: string, price: number[] }) => {
-    // const response = await fetch('/api/crypto-prices', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(newData),
-    // })
-    console.log(newData);
-    const response = await fetch('/api/crypto-prices')
+    const response = await fetch('/api/crypto-prices', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newData),
+    })
+    // console.log(newData);
+    // const response = await fetch('/api/crypto-prices')
     const data = await response.json()
     setAltcoins(data);
   };

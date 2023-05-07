@@ -20,12 +20,11 @@ export default async function handler(
   res: NextApiResponse<Ialtcoins[] | string>
 ) {
 
-  // if (req.method === "POST") {
-  //   altcoins.push(req.body);
-  // }
-  altcoins.push({name: 'BTCUSDT', price:[25000]})
-
+  if (req.method === "POST") {
+    altcoins.push(req.body);
+  }
   const prices = await fetchAltcoinPrices(altcoins);
+
   for (let i = 0; i < altcoins.length; i++) {
     const targetAltcoin = altcoins[i].name;
     const targetPrice = altcoins[i].price;
@@ -49,7 +48,7 @@ export default async function handler(
       continue;
     }
   }
-
+  
   res.status(200).json(altcoins);
 }
 
