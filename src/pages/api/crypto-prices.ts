@@ -10,7 +10,7 @@ interface AltcoinPrices {
 
 interface Ialtcoins {
   name: string;
-  price: number[];
+  price: number;
 }
 
 let altcoins: Ialtcoins[] = [];
@@ -29,22 +29,19 @@ export default async function handler(
     const targetAltcoin = altcoins[i].name;
     const targetPrice = altcoins[i].price;
     const targetAltcoinMaxPrice = prices[targetAltcoin]?.max;
-    const targetAltcoinMinPrice = prices[targetAltcoin]?.min;
-    for (let i = 0; i < targetPrice.length; i++) {
-      if (
-        targetAltcoinMaxPrice &&
-        targetAltcoinMinPrice &&
-        targetPrice[i] >= targetAltcoinMinPrice &&
-        targetPrice[i] <= targetAltcoinMaxPrice
-      ) {
-        await sendTelegramNotification(
-          targetAltcoin,
-          targetAltcoinMaxPrice,
-          targetAltcoinMinPrice,
-          targetPrice[i]
-        );
-        continue;
-      }
+    const targetAltcoinMinPrice = prices[targetAltcoin]?.min;    
+    if (
+      targetAltcoinMaxPrice &&
+      targetAltcoinMinPrice &&
+      targetPrice >= targetAltcoinMinPrice &&
+      targetPrice <= targetAltcoinMaxPrice
+    ) {
+      await sendTelegramNotification(
+        targetAltcoin,
+        targetAltcoinMaxPrice,
+        targetAltcoinMinPrice,
+        targetPrice
+      );
       continue;
     }
   }

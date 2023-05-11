@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { InputText } from "primereact/inputtext";
+import { InputNumber } from 'primereact/inputnumber';
 
 type DataObject = {
   name: string;
-  price: number[];
+  price: number;
 };
 
 const EditableDataForm = ({onSubmit}: any) => {
   const [name, setName] = useState<string>();
-  const [price, setPrice] = useState<number[]>();
+  const [price, setPrice] = useState<number | null>();
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -27,11 +28,13 @@ const EditableDataForm = ({onSubmit}: any) => {
       </label>
       <label>
         Price:
-        <InputText
-          type="text"
-          value={String(price)}
-          onChange={(event) =>
-            setPrice(event.target.value.split(",").map(Number))
+        <InputNumber
+          mode="currency"
+          currency="USD"
+          step={0.0001}
+          value={price}
+          onValueChange={(event) =>
+            setPrice(event.value)
           }
         />
       </label>

@@ -8,13 +8,13 @@ import Form from './components/Form/Form';
 
 interface Ialtcoins {
   name: string;
-  price: number[];
+  price: number;
 }
 
 export default function Home() {
   const [altcoins, setAltcoins] = useState<Ialtcoins[]>([]);
 
-  const handleSubmit = async ( newData: { name: string, price: number[] }) => {
+  const handleSubmit = async ( newData: { name: string, price: number }) => {
     const response = await fetch('/api/crypto-prices', {
       method: 'POST',
       headers: {
@@ -22,8 +22,6 @@ export default function Home() {
       },
       body: JSON.stringify(newData),
     })
-    // console.log(newData);
-    // const response = await fetch('/api/crypto-prices')
     const data = await response.json()
     setAltcoins(data);
   };
@@ -35,11 +33,10 @@ export default function Home() {
       </div>
       <div className={styles.item__main}>
         {altcoins && altcoins.map((item) => {
-          const prices = String(item.price)
           return (
             <>
               <p>{item.name}</p>
-              <p>{prices}</p>
+              <p>{item.price}</p>
             </>
           )
         })}
