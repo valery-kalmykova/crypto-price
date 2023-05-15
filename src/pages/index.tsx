@@ -26,6 +26,15 @@ export default function Home() {
     setAltcoins(data);
   };
 
+  const sendMsg = async () => {
+    const response = await fetch('/api/send-test-msg', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  }
+
   return (
     <div className={styles.section}>
       <div className={styles.item__header}>
@@ -41,6 +50,7 @@ export default function Home() {
           )
         })}
         <Form onSubmit={handleSubmit}/>
+        <button onClick={sendMsg}>Отправить сообщение-тест в телегу</button>
         {/* <Main /> */}
       </div>
       <div className={styles.item__sidebar}>
