@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import axios from 'axios';
 
 export default async function handler(
     req: NextApiRequest,
@@ -10,7 +9,7 @@ export default async function handler(
   };
 
 async function getCurrencies() {
-    const response = await axios.get<any>('https://fapi.binance.com/fapi/v1/exchangeInfo');
-    const data = response.data.symbols
-    return data;
+    const response = await fetch('https://fapi.binance.com/fapi/v1/exchangeInfo');
+    const data = await response.json();
+    return data.symbols;
 }

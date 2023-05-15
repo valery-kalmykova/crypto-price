@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import axios from "axios";
 
 interface AltcoinPrices {
   [key: string]: {
@@ -59,10 +58,11 @@ async function fetchAltcoinPrices(
     const altcoin = altcoins[i].name;
     const interval = "5m";
     const limit = 1;
-    const response = await axios.get<any[][]>(
+    const response = await fetch(
       `${baseUrl}?symbol=${altcoin}&interval=${interval}&limit=${limit}`
     );
-    const [high, low] = response.data[0];
+    const data: any[][] = await response.json();
+    const [timestamp, open, high, low, close, volume, closeTime, quoteAssetVolume, numberOfTrades, takerBuyBaseAssetVolume, takerBuyQuoteAssetVolume, ignored] = data[0];
     altcoinPrices[altcoin] = {
       max: parseFloat(high),
       min: parseFloat(low),
@@ -82,11 +82,7 @@ async function sendTelegramNotification(
   const chatId = process.env.CHAT_ID;
   const message = `${altcoin} price is currently between ${minPrice} and ${maxPrice}, and the target price ${targetPrice} is within this range.`;
 
-  await axios.post(
-    `https://api.telegram.org/bot${telegramBotToken}/sendMessage`,
-    {
-      chat_id: chatId,
-      text: message,
-    }
+  await fetch(
+    `https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${chatId}&text=${message}`,
   );
 }

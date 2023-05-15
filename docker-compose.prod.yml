@@ -12,6 +12,12 @@ services:
     restart: always
     ports:
       - 6060:6060
+    networks:
+      - my_network
+      
+networks:
+  my_network:
+    external: true
 
   # Add more containers below (nginx, postgres, etc.)
 
