@@ -1,4 +1,4 @@
-version: '3'
+version: '3.9'
 
 services:
   next-app:
@@ -14,12 +14,23 @@ services:
       - 6060:6060
     networks:
       - my_network
+    
+  db:
+    container_name: db
+    image: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+    networks:
+      - my_network
       
 networks:
   my_network:
-    external: true
 
-  # Add more containers below (nginx, postgres, etc.)
-
-# Define a network, which allows containers to communicate
-# with each other, by using their container name as a hostname
+volumes:
+  db_data:
