@@ -1,3 +1,4 @@
+import prisma from "@/lib/clients/prisma";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 interface AltcoinPrices {
@@ -9,43 +10,41 @@ interface AltcoinPrices {
 
 interface Ialtcoins {
   name: string;
-  price: number;
+  prices: string[];
 }
-
-let altcoins: Ialtcoins[] = [];
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Ialtcoins[] | string>
+  res: NextApiResponse<AltcoinPrices | string>
 ) {
 
-  if (req.method === "POST") {
-    altcoins.push(req.body);
-  }
+  const altcoins = await prisma.currency.findMany();
+  
   const prices = await fetchAltcoinPrices(altcoins);
 
   for (let i = 0; i < altcoins.length; i++) {
     const targetAltcoin = altcoins[i].name;
-    const targetPrice = altcoins[i].price;
+    const targetPrice = altcoins[i].prices;
     const targetAltcoinMaxPrice = prices[targetAltcoin]?.max;
-    const targetAltcoinMinPrice = prices[targetAltcoin]?.min;    
-    if (
-      targetAltcoinMaxPrice &&
-      targetAltcoinMinPrice &&
-      targetPrice >= targetAltcoinMinPrice &&
-      targetPrice <= targetAltcoinMaxPrice
-    ) {
-      await sendTelegramNotification(
-        targetAltcoin,
-        targetAltcoinMaxPrice,
-        targetAltcoinMinPrice,
-        targetPrice
-      );
+    const targetAltcoinMinPrice = prices[targetAltcoin]?.min;
+    for (let i = 0; i < targetPrice.length; i++) {
+      if (
+        Number(targetPrice[i]) >= targetAltcoinMinPrice &&
+        Number(targetPrice[i]) <= targetAltcoinMaxPrice
+      ) {
+        await sendTelegramNotification(
+          targetAltcoin,
+          targetAltcoinMaxPrice,
+          targetAltcoinMinPrice,
+          targetPrice[i]
+        );
+        continue;
+      }
       continue;
     }
   }
   
-  res.status(200).json(altcoins);
+  res.status(200).json(prices);
 }
 
 async function fetchAltcoinPrices(
@@ -76,7 +75,7 @@ async function sendTelegramNotification(
   altcoin: string,
   maxPrice: number,
   minPrice: number,
-  targetPrice: number
+  targetPrice: string
 ): Promise<void> {
   const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.CHAT_ID;

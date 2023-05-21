@@ -1,39 +1,10 @@
-import { useEffect, useState } from 'react';
-import { InputText } from "primereact/inputtext";
-import styles from './styles.module.css';
-import Header from './components/Header/Header';
-import Main from './components/Main/Main';
-import Sidebar from './components/Sidebar/Sidebar';
-import Form from './components/Form/Form';
-
-interface Ialtcoins {
-  name: string;
-  price: number;
-}
+import React from "react";
+import styles from "./styles.module.css";
+import Header from "../components/Header/Header";
+import Sidebar from "../components/Sidebar/Sidebar";
+import Main from "../components/Main/Main";
 
 export default function Home() {
-  const [altcoins, setAltcoins] = useState<Ialtcoins[]>([]);
-
-  const handleSubmit = async ( newData: { name: string, price: number }) => {
-    const response = await fetch('/api/crypto-prices', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newData),
-    })
-    const data = await response.json()
-    setAltcoins(data);
-  };
-
-  const sendMsg = async () => {
-    const response = await fetch('/api/send-test-msg', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-  }
 
   return (
     <div className={styles.section}>
@@ -41,21 +12,11 @@ export default function Home() {
         <Header />
       </div>
       <div className={styles.item__main}>
-        {altcoins && altcoins.map((item) => {
-          return (
-            <>
-              <p>{item.name}</p>
-              <p>{item.price}</p>
-            </>
-          )
-        })}
-        <Form onSubmit={handleSubmit}/>
-        <button onClick={sendMsg}>Отправить сообщение-тест в телегу</button>
-        {/* <Main /> */}
+        <Main />
       </div>
       <div className={styles.item__sidebar}>
         <Sidebar />
       </div>
     </div>
-  )
+  );
 }
