@@ -55,7 +55,7 @@ async function fetchAltcoinPrices(
 
   for (let i = 0; i < altcoins.length; i++) {
     const altcoin = altcoins[i].name;
-    const interval = "5m";
+    const interval = "1d";
     const limit = 1;
     const response = await fetch(
       `${baseUrl}?symbol=${altcoin}&interval=${interval}&limit=${limit}`
@@ -79,7 +79,7 @@ async function sendTelegramNotification(
 ): Promise<void> {
   const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.CHAT_ID;
-  const message = `${altcoin} price is currently between ${minPrice} and ${maxPrice}, and the target price ${targetPrice} is within this range.`;
+  const message = `${altcoin} target price ${targetPrice} reached.`;
 
   await fetch(
     `https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${chatId}&text=${message}`,
