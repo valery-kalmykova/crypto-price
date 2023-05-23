@@ -17,9 +17,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<AltcoinPrices | string>
 ) {
-
   const altcoins = await prisma.currency.findMany();
-  
+
   const prices = await fetchAltcoinPrices(altcoins);
 
   for (let i = 0; i < altcoins.length; i++) {
@@ -40,10 +39,10 @@ export default async function handler(
         );
         continue;
       }
-      continue;
     }
+    continue;
   }
-  
+
   res.status(200).json(prices);
 }
 
@@ -54,20 +53,34 @@ async function fetchAltcoinPrices(
   const baseUrlFutures = "https://fapi.binance.com";
   const altcoinPrices: AltcoinPrices = {};
 
-  const serverTime = await fetch(`${baseUrlFutures}/fapi/v1/time`)
+  const serverTime = await fetch(`${baseUrlFutures}/fapi/v1/time`);
   const serverTimeData = await serverTime.json();
 
   for (let i = 0; i < altcoins.length; i++) {
     const altcoin = altcoins[i].name;
     const interval = "5m";
     const limit = 1;
-    const startTime = new Date(serverTimeData.serverTime).setSeconds(0,0)-(5*60*1000);
+    const startTime =
+      new Date(serverTimeData.serverTime).setSeconds(0, 0) - 5 * 60 * 1000;
     console.log(startTime);
     const response = await fetch(
       `${baseUrl}?symbol=${altcoin}&interval=${interval}&limit=${limit}&startTime=${startTime}`
     );
     const data: any[][] = await response.json();
-    const [timestamp, open, high, low, close, volume, closeTime, quoteAssetVolume, numberOfTrades, takerBuyBaseAssetVolume, takerBuyQuoteAssetVolume, ignored] = data[0];
+    const [
+      timestamp,
+      open,
+      high,
+      low,
+      close,
+      volume,
+      closeTime,
+      quoteAssetVolume,
+      numberOfTrades,
+      takerBuyBaseAssetVolume,
+      takerBuyQuoteAssetVolume,
+      ignored,
+    ] = data[0];
     altcoinPrices[altcoin] = {
       max: parseFloat(high),
       min: parseFloat(low),
@@ -88,6 +101,6 @@ async function sendTelegramNotification(
   const message = `${altcoin} target price ${targetPrice} reached.`;
 
   await fetch(
-    `https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${chatId}&text=${message}`,
+    `https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${chatId}&text=${message}`
   );
 }
