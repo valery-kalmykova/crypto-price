@@ -51,14 +51,20 @@ async function fetchAltcoinPrices(
   altcoins: Ialtcoins[]
 ): Promise<AltcoinPrices> {
   const baseUrl = "https://api.binance.com/api/v3/klines";
+  const baseUrlFutures = "https://fapi.binance.com";
   const altcoinPrices: AltcoinPrices = {};
+
+  const serverTime = await fetch(`${baseUrlFutures}/fapi/v1/time`)
+  const serverTimeData = await serverTime.json();
 
   for (let i = 0; i < altcoins.length; i++) {
     const altcoin = altcoins[i].name;
-    const interval = "1d";
+    const interval = "5m";
     const limit = 1;
+    const startTime = new Date(serverTimeData.serverTime).setSeconds(0,0)-(5*60*1000);
+    console.log(startTime);
     const response = await fetch(
-      `${baseUrl}?symbol=${altcoin}&interval=${interval}&limit=${limit}`
+      `${baseUrl}?symbol=${altcoin}&interval=${interval}&limit=${limit}&startTime=${startTime}`
     );
     const data: any[][] = await response.json();
     const [timestamp, open, high, low, close, volume, closeTime, quoteAssetVolume, numberOfTrades, takerBuyBaseAssetVolume, takerBuyQuoteAssetVolume, ignored] = data[0];
