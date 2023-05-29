@@ -3,14 +3,14 @@ import styles from "./styles.module.css";
 import TextField from "@mui/material/TextField";
 import { useCurrencyContext } from "@/context/currencies";
 import { Switch } from "@mui/material";
-import { getCurrencyList } from "@/utils/shared";
+import { getCurrencyList, sortArray } from "@/utils/shared";
 
 function Sidebar() {
   const [searchText, setSearchText] = useState("");
   const [isLoading, setLoading] = useState(false);
   const [onlyWatched, setOnlyWatched] = useState(false);
   const value = useCurrencyContext();
-  const {setActiveCurrency, setAllCurrencies} = useCurrencyContext();
+  const { setActiveCurrency, setAllCurrencies } = useCurrencyContext();
   const currencies = value?.allCurrencies;
   let filteredCurrencies: any[] = [];
 
@@ -19,6 +19,8 @@ function Sidebar() {
       setLoading(true);
       try {
         const cussenciesData = await getCurrencyList();
+        const sortedData = sortArray(cussenciesData);
+        setAllCurrencies(sortedData);
         setAllCurrencies(cussenciesData);
         setLoading(false);
       } catch (err) {
@@ -50,7 +52,12 @@ function Sidebar() {
       />
       <div style={{ marginLeft: "10px" }}>
         Show only watched
-        <Switch onClick={() => setOnlyWatched(!onlyWatched)} />
+        <Switch
+          onClick={() => {
+            setOnlyWatched(!onlyWatched);
+            setSearchText("");
+          }}
+        />
       </div>
       <ul className={styles.list}>
         {isLoading

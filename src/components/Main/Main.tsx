@@ -3,7 +3,7 @@ import styles from "./styles.module.css";
 import Chip from "@mui/material/Chip";
 import Form from "../Form/Form";
 import { useCurrencyContext } from "@/context/currencies";
-import { getCurrencyList } from "@/utils/shared";
+import { getCurrencyList, sortArray } from "@/utils/shared";
 
 const Main = () => {
   const value = useCurrencyContext();
@@ -26,7 +26,8 @@ const Main = () => {
 
   const updateAllCurrencies = async () => {
     const cussenciesData = await getCurrencyList();
-    setAllCurrencies(cussenciesData);
+    const sortedData = sortArray(cussenciesData);
+    setAllCurrencies(sortedData);
   };
 
   const fetchWatchedCurrencies = async (
@@ -45,14 +46,15 @@ const Main = () => {
   };
 
   const handleSubmit = async (price: string) => {
-    const newData = { name: activeCurrency!, price: price };
+    const formatPrice = price.replace(',', '.');
+    const newData = { name: activeCurrency!, price: formatPrice };
     if (activeCurrencyPrices.length === 0) {
       await fetchWatchedCurrencies("POST", newData);
       await updateAllCurrencies();
     } else {
       await fetchWatchedCurrencies("PATCH", newData);
     }
-    setActiveCurrencyPrices([...activeCurrencyPrices, price]);
+    setActiveCurrencyPrices([...activeCurrencyPrices, formatPrice]);
   };
 
   const handleDelete = async (price: string) => {

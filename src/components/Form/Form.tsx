@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import styles from "./styles.module.css";
 import TextField from "@mui/material/TextField";
-import { FormControl } from '@mui/material';
 import Button from '@mui/material/Button';
 import SendIcon from '@mui/icons-material/Send';
 

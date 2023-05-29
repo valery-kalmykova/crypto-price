@@ -16,3 +16,7 @@ export const getCurrencyList = async () => {
       console.log(err);
     }
   };
+
+  export const sortArray = (arr: any) => {
+    return arr.sort((a: any, b: any) => (a.symbol > b.symbol ? 1 : -1));
+  };

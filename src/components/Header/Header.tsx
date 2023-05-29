@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./styles.module.css";
-import Button from "@mui/material/Button";
+import IconButton from '@mui/material/IconButton';
 import CachedIcon from "@mui/icons-material/Cached";
 import { useCurrencyContext } from "@/context/currencies";
 
@@ -15,9 +15,9 @@ const Header = () => {
   return (
     <div className={styles.container}>
       {activeCurrency && activeCurrency}
-      <Button variant="outlined" endIcon={<CachedIcon />} onClick={checkPrices}>
-        Check prices
-      </Button>
+      <IconButton aria-label="check-prices" onClick={checkPrices}>
+        <CachedIcon />
+      </IconButton>
     </div>
   );
 };
