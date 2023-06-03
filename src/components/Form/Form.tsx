@@ -14,9 +14,10 @@ const EditableDataForm = ({ onSubmit }: any) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className={styles.container}>
+    <form onSubmit={handleSubmit} className={styles.container} noValidate autoComplete="off">
       <TextField
         placeholder="Add price"
+        inputProps={{ inputMode: 'numeric', pattern: '[0-9.,]*' }}
         value={price}
         onChange={(event) => setPrice(event.target.value)}
       />

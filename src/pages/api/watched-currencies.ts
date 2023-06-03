@@ -18,27 +18,41 @@ export default async function handler(
     });
     res.status(200).json(result);
   } else if (req.method === "PATCH") {
-    const { name, price } = req.body;
+    const { name, price, trendFlag } = req.body;
     const currency = await prisma.currency.findUnique({
       where: { name: name },
     });
-    let newprices = currency?.prices!;
-    if (newprices.includes(price)) {
+    if (price) {
+      let newprices = currency?.prices!;
+      if (newprices.includes(price)) {
         newprices.splice(newprices.indexOf(price), 1);
-    } else {
+      } else {
         newprices.push(price);
-    }
-    const result = await prisma.currency.update({
-      where: {
-        name: String(name),
-      },
-      data: {
-        prices: {
-          set: newprices,
+      }
+      const result = await prisma.currency.update({
+        where: {
+          name: String(name),
         },
-      },
-    });
-    res.status(200).json(result);
+        data: {
+          prices: {
+            set: newprices,
+          },
+        },
+      });
+      res.status(200).json(result);
+    } else {
+      const result = await prisma.currency.update({
+        where: {
+          name: String(name),
+        },
+        data: {
+          trendFlag: {
+            set: trendFlag,
+          },
+        },
+      });
+      res.status(200).json(result);
+    }
   } else {
     res.status(405).send({ message: "Request not allowed" });
     return;

@@ -13,7 +13,11 @@ export default async function handler(
               name: String(activeCurrency)
           }
       })
-      res.status(200).json(result);
+      if (!result) {
+        res.status(200).json("Not found in db")
+      } else {
+        res.status(200).json(result);
+      }
     } else if (req.method === 'DELETE') {
       const query = req.query;
       const { activeCurrency } = query;
@@ -27,5 +31,4 @@ export default async function handler(
       res.status(405).send({ message: "Request not allowed" });
       return;
     }
-     
   };
