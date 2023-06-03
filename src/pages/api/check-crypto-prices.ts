@@ -39,6 +39,13 @@ export default async function handler(
         Number(targetPrice[i]) <= targetAltcoinMaxPrice
       ) {
         await sendTelegramNotification(targetAltcoin, targetPrice[i]);
+        setTimeout(() => {
+          checkIfTrendChange(
+            targetAltcoin,
+            targetAltcoinOpenPrice,
+            targetAltcoinClosePrice
+          );
+        }, 180000);
         continue;
       }
     }
@@ -123,3 +130,4 @@ const checkIfTrendChange = async (
     if (close > open) sendTelegramNotification(name);
   }
 };
+
