@@ -1,16 +1,20 @@
 import prisma from "@/lib/clients/prisma";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { baseUrlFutures, destructureBinanceRes } from "@/utils/shared";
 
 interface AltcoinPrices {
   [key: string]: {
     max: number;
     min: number;
+    open: number;
+    close: number;
   };
 }
 
 interface Ialtcoins {
   name: string;
   prices: string[];
+  trendFlag: boolean;
 }
 
 export default async function handler(
@@ -24,22 +28,28 @@ export default async function handler(
   for (let i = 0; i < altcoins.length; i++) {
     const targetAltcoin = altcoins[i].name;
     const targetPrice = altcoins[i].prices;
+    const trendFlag = altcoins[i].trendFlag;
     const targetAltcoinMaxPrice = prices[targetAltcoin]?.max;
     const targetAltcoinMinPrice = prices[targetAltcoin]?.min;
+    const targetAltcoinOpenPrice = prices[targetAltcoin]?.open;
+    const targetAltcoinClosePrice = prices[targetAltcoin]?.close;
     for (let i = 0; i < targetPrice.length; i++) {
       if (
         Number(targetPrice[i]) >= targetAltcoinMinPrice &&
         Number(targetPrice[i]) <= targetAltcoinMaxPrice
       ) {
-        await sendTelegramNotification(
-          targetAltcoin,
-          targetAltcoinMaxPrice,
-          targetAltcoinMinPrice,
-          targetPrice[i]
-        );
+        await sendTelegramNotification(targetAltcoin, targetPrice[i]);
         continue;
       }
     }
+    if (trendFlag)
+    setTimeout(() => {
+      checkIfTrendChange(
+        targetAltcoin,
+        targetAltcoinOpenPrice,
+        targetAltcoinClosePrice
+      );
+    }, 180000);
     continue;
   }
 
@@ -49,8 +59,6 @@ export default async function handler(
 async function fetchAltcoinPrices(
   altcoins: Ialtcoins[]
 ): Promise<AltcoinPrices> {
-  // const baseUrl = "https://api.binance.com/api/v3/klines";
-  const baseUrlFutures = "https://fapi.binance.com";
   const altcoinPrices: AltcoinPrices = {};
 
   const serverTime = await fetch(`${baseUrlFutures}/fapi/v1/time`);
@@ -66,23 +74,12 @@ async function fetchAltcoinPrices(
       `${baseUrlFutures}/fapi/v1/klines?symbol=${altcoin}&interval=${interval}&limit=${limit}&startTime=${startTime}`
     );
     const data: any[][] = await response.json();
-    const [
-      timestamp,
-      open,
-      high,
-      low,
-      close,
-      volume,
-      closeTime,
-      quoteAssetVolume,
-      numberOfTrades,
-      takerBuyBaseAssetVolume,
-      takerBuyQuoteAssetVolume,
-      ignored,
-    ] = data[0];
+    const { high, low, open, close } = destructureBinanceRes(data);
     altcoinPrices[altcoin] = {
       max: parseFloat(high),
       min: parseFloat(low),
+      open: parseFloat(open),
+      close: parseFloat(close),
     };
   }
 
@@ -91,15 +88,38 @@ async function fetchAltcoinPrices(
 
 async function sendTelegramNotification(
   altcoin: string,
-  maxPrice: number,
-  minPrice: number,
-  targetPrice: string
+  targetPrice?: string
 ): Promise<void> {
   const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.CHAT_ID;
-  const message = `${altcoin} target price ${targetPrice} reached.`;
-
+  let message = "";
+  if (targetPrice) {
+    message = `${altcoin} target price ${targetPrice} reached.`;
+  } else {
+    message = `${altcoin}'s changing trand`;
+  }
   await fetch(
     `https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${chatId}&text=${message}`
   );
 }
+
+const checkIfTrendChange = async (
+  name: string,
+  openLast: number,
+  closeLast: number
+) => {
+  const interval = "5m";
+  const limit = 1;
+  const response = await fetch(
+    `${baseUrlFutures}/fapi/v1/klines?symbol=${name}&interval=${interval}&limit=${limit}`
+  );
+  const data: any[][] = await response.json();
+  const { open, close } = destructureBinanceRes(data);
+  if (closeLast > openLast) {
+    // значит был тренд на повышение, нужна красная свеча
+    if (open > close) sendTelegramNotification(name);
+  } else {
+    // значит был тренд на понижение, нужна зеленая свеча
+    if (close > open) sendTelegramNotification(name);
+  }
+};

@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import styles from "./styles.module.css";
 import Chip from "@mui/material/Chip";
 import Form from "../Form/Form";
+import Badge from "@mui/material/Badge";
+import AddIcon from "@mui/icons-material/Add";
+import DoneIcon from "@mui/icons-material/Done";
 import { useCurrencyContext } from "@/context/currencies";
 import { getCurrencyList, sortArray } from "@/utils/shared";
 
@@ -11,12 +14,25 @@ const Main = () => {
   const [activeCurrencyPrices, setActiveCurrencyPrices] = useState<string[]>(
     []
   );
+  const [waitTrandChange, setWaitTrandChange] = useState<Boolean>(false);
 
   useEffect(() => {
     if (activeCurrency !== "") {
       fetch(`/api/watched-currencies/${activeCurrency}`)
         .then((res) => res.json())
-        .then((data) => setActiveCurrencyPrices(data.prices))
+        .then((data) => {
+          const {prices, trendFlag} = data;
+          if (prices) {
+            setActiveCurrencyPrices(prices);
+          } else {
+            setActiveCurrencyPrices([]);
+          }
+          if (trendFlag) {
+            setWaitTrandChange(trendFlag);
+          } else {
+            setWaitTrandChange(false);
+          }
+        })
         .catch((err) => {
           console.log(err);
           setActiveCurrencyPrices([]);
@@ -46,7 +62,7 @@ const Main = () => {
   };
 
   const handleSubmit = async (price: string) => {
-    const formatPrice = price.replace(',', '.');
+    const formatPrice = price.replace(",", ".");
     const newData = { name: activeCurrency!, price: formatPrice };
     if (activeCurrencyPrices.length === 0) {
       await fetchWatchedCurrencies("POST", newData);
@@ -65,12 +81,19 @@ const Main = () => {
       });
       await updateAllCurrencies();
       setActiveCurrencyPrices([]);
+      setWaitTrandChange(false);
     } else {
       await fetchWatchedCurrencies("PATCH", { name, price });
       setActiveCurrencyPrices(
         activeCurrencyPrices.filter((priceI) => priceI !== price)
       );
     }
+  };
+
+  const handleWaitTrendChange = async () => {
+    const newData = { name: activeCurrency!, trendFlag: !waitTrandChange };
+    setWaitTrandChange(!waitTrandChange);
+    await fetchWatchedCurrencies("PATCH", newData);
   };
 
   return (
@@ -87,6 +110,25 @@ const Main = () => {
             />
           );
         })}
+      <Badge
+        badgeContent={
+          waitTrandChange ? (
+            <DoneIcon fontSize="small" />
+          ) : (
+            <AddIcon fontSize="small" />
+          )
+        }
+        color="success"
+      >
+        <button
+          disabled={activeCurrencyPrices.length === 0}
+          className={styles.button}
+          type="button"
+          onClick={handleWaitTrendChange}
+        >
+          Wait for trend change
+        </button>
+      </Badge>
     </div>
   );
 };
