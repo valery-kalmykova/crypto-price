@@ -21,7 +21,6 @@ function Sidebar() {
         const cussenciesData = await getCurrencyList();
         const sortedData = sortArray(cussenciesData);
         setAllCurrencies(sortedData);
-        setAllCurrencies(cussenciesData);
         setLoading(false);
       } catch (err) {
         console.log(err);

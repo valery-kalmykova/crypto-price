@@ -9,7 +9,7 @@ const Header = () => {
   const activeCurrency = value?.activeCurrency;
 
   const checkPrices = async () => {
-    await fetch(`/api/check-crypto-prices`);
+    await fetch(`/api/check-crypto-prices`); // top-changed-symbols check-crypto-prices
   };
 
   return (
