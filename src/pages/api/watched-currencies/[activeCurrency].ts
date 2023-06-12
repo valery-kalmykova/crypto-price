@@ -1,5 +1,6 @@
 import prisma from '@/lib/clients/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { getCurrentPrice } from '@/utils/shared';
 
 export default async function handler(
     req: NextApiRequest,

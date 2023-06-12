@@ -70,6 +70,7 @@ export const fetchAltcoinPrices = async (
 
   const serverTime = await fetch(`${baseUrlFutures}/fapi/v1/time`);
   const serverTimeData = await serverTime.json();
+  console.log(serverTimeData)
   const interval = intervalVal;
   const limit = 1000;
   let startTime;
@@ -109,3 +110,10 @@ export const sendTelegramNotification = async (
     `https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${chatId}&text=${message}`
   );
 };
+
+export const getCurrentPrice = async (symbol: string) => {
+  const response = await fetch(`${baseUrlFutures}/fapi/v1/ticker/price?symbol=${symbol}`);
+  const data: any = await response.json();
+  const price = data.price;
+  return price;
+}
