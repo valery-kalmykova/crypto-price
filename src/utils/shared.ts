@@ -70,7 +70,6 @@ export const fetchAltcoinPrices = async (
 
   const serverTime = await fetch(`${baseUrlFutures}/fapi/v1/time`);
   const serverTimeData = await serverTime.json();
-  console.log(serverTimeData)
   const interval = intervalVal;
   const limit = 1000;
   let startTime;
