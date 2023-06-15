@@ -6,7 +6,8 @@ import Badge from "@mui/material/Badge";
 import AddIcon from "@mui/icons-material/Add";
 import DoneIcon from "@mui/icons-material/Done";
 import { useCurrencyContext } from "@/context/currencies";
-import { getCurrencyList, sortArray } from "@/utils/shared";
+import { getCurrencyList, getCurrentPrice, sortArray } from "@/utils/shared";
+import { WaitButton } from "./WaitButton";
 
 const Main = () => {
   const value = useCurrencyContext();
@@ -14,15 +15,19 @@ const Main = () => {
   const [activeCurrencyPrices, setActiveCurrencyPrices] = useState<string[]>(
     []
   );
-  const [waitTrandChange, setWaitTrandChange] = useState<Boolean>(false);
+  const [waitTrandChange, setWaitTrandChange] = useState<boolean>(false);
+  const [currentPrice, setCurrentPrice] = useState<string>("");
 
   useEffect(() => {
     if (activeCurrency !== "") {
       fetch(`/api/watched-currencies/${activeCurrency}`)
         .then((res) => res.json())
         .then((data) => {
-          const {prices, trendFlag} = data;
+          const { prices, trendFlag } = data;
           if (prices) {
+            prices.sort((a: string, b: string) =>
+              Number(a) > Number(b) ? 1 : -1
+            );
             setActiveCurrencyPrices(prices);
           } else {
             setActiveCurrencyPrices([]);
@@ -37,6 +42,15 @@ const Main = () => {
           console.log(err);
           setActiveCurrencyPrices([]);
         });
+      (async () => {
+        try {
+          const data = await getCurrentPrice(activeCurrency);
+          setCurrentPrice(data);
+        } catch (err) {
+          setCurrentPrice("");
+          console.log(err);
+        }
+      })();
     }
   }, [activeCurrency]);
 
@@ -70,7 +84,11 @@ const Main = () => {
     } else {
       await fetchWatchedCurrencies("PATCH", newData);
     }
-    setActiveCurrencyPrices([...activeCurrencyPrices, formatPrice]);
+    setActiveCurrencyPrices(
+      [...activeCurrencyPrices, formatPrice].sort((a: string, b: string) =>
+        Number(a) > Number(b) ? 1 : -1
+      )
+    );
   };
 
   const handleDelete = async (price: string) => {
@@ -98,11 +116,23 @@ const Main = () => {
 
   return (
     <div className={styles.container}>
-      <Form onSubmit={handleSubmit} />
+      <div className={styles.flexRow}>
+        <Form onSubmit={handleSubmit} currentPrice={currentPrice} />
+        <WaitButton
+          waitTrandChange={waitTrandChange}
+          activeCurrencyPrices={activeCurrencyPrices}
+          handleWaitTrendChange={handleWaitTrendChange}
+        />
+      </div>
       {activeCurrencyPrices &&
-        activeCurrencyPrices.map((price) => {
+        activeCurrencyPrices.map((price: string) => {
           return (
             <Chip
+              sx={
+                Number(price) >= Number(currentPrice)
+                  ? { color: "#2e7d32" }
+                  : { color: "#d32f2f" }
+              }
               key={price}
               label={price}
               variant="outlined"
@@ -110,25 +140,6 @@ const Main = () => {
             />
           );
         })}
-      <Badge
-        badgeContent={
-          waitTrandChange ? (
-            <DoneIcon fontSize="small" />
-          ) : (
-            <AddIcon fontSize="small" />
-          )
-        }
-        color="success"
-      >
-        <button
-          disabled={activeCurrencyPrices.length === 0}
-          className={styles.button}
-          type="button"
-          onClick={handleWaitTrendChange}
-        >
-          Wait for trend change
-        </button>
-      </Badge>
     </div>
   );
 };

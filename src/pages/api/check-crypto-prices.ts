@@ -31,26 +31,24 @@ export default async function handler(
         await sendTelegramNotification(
           `${targetAltcoin} target price ${targetPrice[i]} reached.`
         );
-        const timer = setTimeout(() => {
+        setTimeout(() => {
           checkIfTrendChange(
             targetAltcoin,
             targetAltcoinOpenPrice,
             targetAltcoinClosePrice
           );
         }, 180000);
-        clearTimeout(timer);
         continue;
       }
     }
     if (trendFlag) {
-      const timer = setTimeout(() => {
+      setTimeout(() => {
         checkIfTrendChange(
           targetAltcoin,
           targetAltcoinOpenPrice,
           targetAltcoinClosePrice
         );
       }, 180000);
-      clearTimeout(timer);
     }
     continue;
   }
