@@ -59,7 +59,8 @@ export const destructureBinanceRes = (data: any) => {
 export const getCurrencies = async () => {
   const response = await fetch("https://fapi.binance.com/fapi/v1/exchangeInfo");
   const data = await response.json();
-  return data.symbols;
+  const perpertualContracts = data.symbols.filter((item: any) => item.contractType === "PERPETUAL")
+  return perpertualContracts;
 };
 
 export const fetchAltcoinPrices = async (
@@ -82,8 +83,7 @@ export const fetchAltcoinPrices = async (
   }
 
   for (let i = 0; i < altcoins.length; i++) {
-    let altcoin = "";
-    altcoins[i].name ? altcoin = altcoins[i].name : altcoin = altcoins[i].symbol!;
+    let altcoin = altcoins[i].symbol!;
     const response = await fetch(
       `${baseUrlFutures}/fapi/v1/klines?symbol=${altcoin}&interval=${interval}&limit=${limit}&startTime=${startTime}`
     );
@@ -111,8 +111,10 @@ export const sendTelegramNotification = async (
 };
 
 export const getCurrentPrice = async (symbol: string) => {
-  const response = await fetch(`${baseUrlFutures}/fapi/v1/ticker/price?symbol=${symbol}`);
+  const response = await fetch(
+    `${baseUrlFutures}/fapi/v1/ticker/price?symbol=${symbol}`
+  );
   const data: any = await response.json();
   const price = data.price;
   return price;
-}
+};
