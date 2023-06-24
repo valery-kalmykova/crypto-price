@@ -4,6 +4,7 @@ import {
   sendTelegramNotification,
   getCurrencies,
 } from "@/utils/shared";
+import { AltcoinPrices } from "@/utils/types";
 
 export default async function handler(
   req: NextApiRequest,
@@ -23,7 +24,21 @@ export default async function handler(
 
 const get4hBarsRating = async () => {
   const currenciesList = await getCurrencies();
+  // const numChunks = Math.floor(currenciesList.length/100);
+  // let startChunkNum = 0;
+  // let endChunkNum = 100;
+  // let currenciesWithPrices: AltcoinPrices = {};
   const currenciesWithPrices = await fetchAltcoinPrices(currenciesList, "4h");
+  // for (let i = 0; i <= numChunks; i++) {
+  //   const chunk = await fetchAltcoinPrices(currenciesList.slice(startChunkNum, (i+1)*100), "4h");
+  //   startChunkNum = (i+1)*100;
+  //   if(endChunkNum + startChunkNum >= currenciesList.length) {
+  //     endChunkNum = currenciesList.length
+  //   } else {
+  //     endChunkNum += startChunkNum;
+  //   }
+  //   Object.assign(currenciesWithPrices, chunk);
+  // }
   const currenciesWithChanges = [];
   for (let i = 0; i < currenciesList.length; i++) {
     const symbol = currenciesList[i].symbol;
