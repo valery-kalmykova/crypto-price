@@ -83,7 +83,8 @@ export const fetchAltcoinPrices = async (
   }
 
   for (let i = 0; i < altcoins.length; i++) {
-    let altcoin = altcoins[i].symbol!;
+    let altcoin = "";
+    altcoins[i].name ? altcoin = altcoins[i].name : altcoin = altcoins[i].symbol!;
     const response = await fetch(
       `${baseUrlFutures}/fapi/v1/klines?symbol=${altcoin}&interval=${interval}&limit=${limit}&startTime=${startTime}`
     );
