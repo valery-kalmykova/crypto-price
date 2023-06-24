@@ -130,8 +130,8 @@ const Main = () => {
             <Chip
               sx={
                 Number(price) >= Number(currentPrice)
-                  ? { color: "#2e7d32" }
-                  : { color: "#d32f2f" }
+                  ? { color: "#66bb6a", fontWeight: "500" }
+                  : { color: "#d32f2f", fontWeight: "500" }
               }
               key={price}
               label={price}
